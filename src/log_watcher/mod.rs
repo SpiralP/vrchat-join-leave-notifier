@@ -25,7 +25,7 @@ impl LogWatcher {
             let current_newest_log_path = get_newest_log_path().await.unwrap();
 
             if newest_log_path != current_newest_log_path {
-                println!("new {:?}", current_newest_log_path);
+                println!("new {current_newest_log_path:?}");
                 newest_log_path = current_newest_log_path.clone();
 
                 if let Some(old_handle) = watch_handle.take() {

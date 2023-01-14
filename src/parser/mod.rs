@@ -17,7 +17,7 @@ use crate::notifier::{debounced_notify, MessageEvent};
 const ENTERING_WORLD_LOG: &str = "[Behaviour] Entering world";
 const FINISHED_ENTERING_WORLD_LOG: &str = "[Behaviour] Finished entering world.";
 const ON_LEFT_ROOM_LOG: &str = "[Behaviour] OnLeftRoom";
-// TODO can we know if the game is closed if not getting this?
+// TODO can we know if the game is closed if not getting this? yes we can! openvr close event!
 const APPLICATION_QUIT_LOG_PREFIX: &str = "VRCApplication: OnApplicationQuit at ";
 
 const PLAYER_JOINED_LOG_PREFIX: &str = "[Behaviour] OnPlayerJoined ";
@@ -49,7 +49,6 @@ impl LogParser {
         loop {
             interval.tick().await;
 
-            println!("loop");
             while let Some(line) = lines.next_line().await? {
                 if line.is_empty() {
                     continue;

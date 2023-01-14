@@ -21,10 +21,10 @@ pub async fn create_dir_if_missing<P: AsRef<Path>>(dir: P) -> Result<PathBuf> {
     let dir = dir.as_ref();
 
     if !dir.is_dir() {
-        println!("creating new directory {:?}", dir);
+        println!("creating new directory {dir:?}");
         fs::create_dir(dir)
             .await
-            .with_context(|| format!("creating {:?}", dir))?;
+            .with_context(|| format!("creating {dir:?}"))?;
     }
 
     Ok(dir.to_path_buf())
