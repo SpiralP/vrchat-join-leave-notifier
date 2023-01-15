@@ -214,12 +214,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "quick-error"
-version = "2.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a993555f31e5a609f617c12db6250dedcac1b0a85076912c436e6fc9b2c8e6a3"
-
-[[package]]
 name = "quote"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -391,11 +385,11 @@ dependencies = [
  "anyhow",
  "deunicode",
  "dirs",
+ "lazy_static",
  "openvr",
  "serde",
  "serde_json",
  "tokio",
- "xsoverlay-notifications",
 ]
 
 [[package]]
@@ -482,14 +476,3 @@ name = "windows_x86_64_msvc"
 version = "0.42.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "447660ad36a13288b1db4d4248e857b510e8c3a225c822ba4fb748c0aafecffd"
-
-[[package]]
-name = "xsoverlay-notifications"
-version = "0.1.0"
-source = "git+https://github.com/SpiralP/rust-xsoverlay-notifications.git#30bacc616426dfdac79ce990ab4411ddac48286e"
-dependencies = [
- "quick-error",
- "serde",
- "serde_json",
- "tokio",
-]

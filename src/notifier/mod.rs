@@ -1,39 +1,46 @@
-use std::{collections::HashSet, fmt::Display, time::Duration};
+use std::{cell::RefCell, collections::HashSet, fmt::Display, time::Duration};
 
 use anyhow::Result;
 use deunicode::deunicode;
-use tokio::sync::{Mutex, MutexGuard, OnceCell};
-use xsoverlay_notifications::{Notification, XSOverlayNotifier};
+use tokio::sync::{mpsc, Mutex, MutexGuard, OnceCell};
 
-static NOTIFIER: OnceCell<XSOverlayNotifier> = OnceCell::const_new();
+pub struct Notification {
+    pub sender: mpsc::Sender<String>,
+    pub receiver: Option<mpsc::Receiver<String>>,
+}
 
-// can only see 7 lines at a time
-const MAX_BODY_LINES: usize = 7;
+impl Notification {
+    pub fn new() -> Self {
+        let (sender, receiver) = mpsc::channel(32);
+        Self {
+            sender,
+            receiver: Some(receiver),
+        }
+    }
+}
 
-async fn notify(title: &str, body_lines: Option<Vec<String>>) -> Result<()> {
-    let notifier = NOTIFIER
-        .get_or_try_init(move || async move { XSOverlayNotifier::new().await })
-        .await?;
+impl Default for Notification {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
-    let title = deunicode(title);
-    let body = body_lines
-        .as_ref()
-        .map(|body_lines| format!("<size=20>{}", deunicode(&body_lines.join("\n"))))
-        .unwrap_or_default();
-    println!("{title}");
-    println!("{body}");
+lazy_static::lazy_static!(
+    pub static ref NOTIFICATION: std::sync::Mutex<RefCell<Notification>> =
+    std::sync::Mutex::new(RefCell::new(Notification::new()));
+);
 
-    notifier
-        .send(&Notification {
-            message_type: 1,
-            timeout: 2.0 + body_lines.map(|lines| lines.len() as f32).unwrap_or(0.0) * 0.5,
-            opacity: 0.2,
-            title: title.to_owned(),
-            content: body.to_owned(),
-            height: 250.0,
-            ..Default::default()
-        })
-        .await?;
+async fn notify(text: &str) -> Result<()> {
+    let text = deunicode(text);
+    println!("{text}");
+
+    let sender = {
+        let guard = NOTIFICATION.lock().unwrap();
+        let cell = guard.borrow_mut();
+        cell.sender.clone()
+    };
+
+    sender.send(text).await?;
 
     Ok(())
 }
@@ -104,7 +111,7 @@ pub async fn debounced_notify(event: MessageEvent) -> Result<()> {
                     .await;
 
                 for (title, body_lines) in notifies {
-                    if let Err(e) = notify(&title, body_lines).await {
+                    if let Err(e) = notify(&title).await {
                         eprintln!("{e:?}");
                     }
                 }
@@ -122,7 +129,7 @@ fn group(mut messages: Vec<String>, suffix: &str) -> (String, Option<Vec<String>
     } else {
         let title = format!("{} {suffix}", messages.len());
 
-        if messages.len() < MAX_BODY_LINES {
+        if messages.len() < 7 {
             (title, Some(messages))
         } else {
             // show counts instead of names
