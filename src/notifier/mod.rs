@@ -110,7 +110,7 @@ pub async fn debounced_notify(event: MessageEvent) -> Result<()> {
                     })
                     .await;
 
-                for (title, body_lines) in notifies {
+                for (title, _body_lines) in notifies {
                     if let Err(e) = notify(&title).await {
                         eprintln!("{e:?}");
                     }
