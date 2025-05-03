@@ -11,7 +11,7 @@ use tokio::sync::{
     mpsc,
 };
 
-use crate::notifier::NOTIFICATION;
+use crate::notifier::{notify, NOTIFICATION};
 
 pub async fn start_runtime(shutdown_send: broadcast::Sender<()>) -> Result<()> {
     let mut shutdown_recv = shutdown_send.subscribe();
@@ -39,6 +39,11 @@ pub async fn start_runtime(shutdown_send: broadcast::Sender<()>) -> Result<()> {
 
         println!("start_runtime end");
         let _ = shutdown_send.send(());
+    });
+
+    tokio::spawn(async {
+        tokio::time::sleep(Duration::from_secs(3)).await;
+        notify("init").await.unwrap();
     });
 
     Ok(())

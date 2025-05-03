@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 deunicode = "1"
-dirs = "5"
+dirs = "6"
 lazy_static = "1"
 openvr = { git = "https://github.com/SpiralP/rust-openvr.git" }
 serde = { version = "1", features = ["derive"] }

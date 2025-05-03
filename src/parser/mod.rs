@@ -20,9 +20,12 @@ const ON_LEFT_ROOM_LOG: &str = "[Behaviour] OnLeftRoom";
 // TODO can we know if the game is closed if not getting this? yes we can! openvr close event!
 const APPLICATION_QUIT_LOG_PREFIX: &str = "VRCApplication: OnApplicationQuit at ";
 
+// [Behaviour] OnPlayerJoined SpiralP (usr_...)
 const PLAYER_JOINED_LOG_PREFIX: &str = "[Behaviour] OnPlayerJoined ";
+// [Behaviour] OnPlayerJoinComplete SpiralP
 const PLAYER_JOIN_COMPLETE_LOG_PREFIX: &str = "[Behaviour] OnPlayerJoinComplete ";
 
+// [Behaviour] OnPlayerLeft SpiralP (usr_...)
 const PLAYER_LEFT_LOG_PREFIX: &str = "[Behaviour] OnPlayerLeft ";
 const UNREGISTERING_LOG_PREFIX: &str = "[Behaviour] Unregistering ";
 
@@ -77,13 +80,19 @@ impl LogParser {
             self.handle_world_state_change().await?;
         } else if message.starts_with(APPLICATION_QUIT_LOG_PREFIX) {
             self.handle_world_state_change().await?;
-            //
-        } else if let Some(name) = message.strip_prefix(PLAYER_JOINED_LOG_PREFIX) {
+        } else if let Some(name_and_uid) = message.strip_prefix(PLAYER_JOINED_LOG_PREFIX) {
+            let name = name_and_uid
+                .split_once(" (usr_")
+                .map(|(name, _)| name)
+                .unwrap_or(name_and_uid);
             self.handle_player_join(name).await?;
         } else if let Some(name) = message.strip_prefix(PLAYER_JOIN_COMPLETE_LOG_PREFIX) {
             self.handle_player_join(name).await?;
-            //
-        } else if let Some(name) = message.strip_prefix(PLAYER_LEFT_LOG_PREFIX) {
+        } else if let Some(name_and_uid) = message.strip_prefix(PLAYER_LEFT_LOG_PREFIX) {
+            let name = name_and_uid
+                .split_once(" (usr_")
+                .map(|(name, _)| name)
+                .unwrap_or(name_and_uid);
             self.handle_player_leave(name).await?;
         } else if let Some(name) = message.strip_prefix(UNREGISTERING_LOG_PREFIX) {
             self.handle_player_leave(name).await?;

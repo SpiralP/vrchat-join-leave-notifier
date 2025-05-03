@@ -30,7 +30,7 @@ lazy_static::lazy_static!(
     std::sync::Mutex::new(RefCell::new(Notification::new()));
 );
 
-async fn notify(text: &str) -> Result<()> {
+pub async fn notify(text: &str) -> Result<()> {
     let text = deunicode(text);
     println!("{text}");
 
