@@ -6,7 +6,7 @@ use std::{
 use anyhow::{bail, Context, Result};
 use tokio::fs;
 
-async fn get_vrchat_dir() -> Result<PathBuf> {
+pub async fn get_vrchat_dir() -> Result<PathBuf> {
     let vrchat_dir = {
         #[cfg(target_os = "windows")]
         {
@@ -25,6 +25,11 @@ async fn get_vrchat_dir() -> Result<PathBuf> {
                     ".steam/steam/steamapps/compatdata/438100/pfx/drive_c/users/steamuser/AppData",
                 )
                 .join("LocalLow/VRChat/VRChat")
+        }
+
+        #[cfg(not(any(target_os = "linux", target_os = "windows")))]
+        {
+            compile_error!("TODO");
         }
     };
 

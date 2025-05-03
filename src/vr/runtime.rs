@@ -27,8 +27,6 @@ pub async fn start_runtime(shutdown_send: broadcast::Sender<()>) -> Result<()> {
                 },
                 option = vr_event_receiver.recv() => {
                     if let Some(event) = option {
-                        println!("{event:?}");
-
                         if let Event::Quit(_) = event {
                             break;
                         }

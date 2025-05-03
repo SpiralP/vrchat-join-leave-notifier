@@ -68,10 +68,12 @@ impl LogParser {
         let message = parts.next().context("no second part")?.trim();
 
         if message == ENTERING_WORLD_LOG {
+            self.handle_entering_world().await?;
             self.handle_world_state_change().await?;
         } else if message == FINISHED_ENTERING_WORLD_LOG {
             self.handle_world_state_change().await?;
         } else if message == ON_LEFT_ROOM_LOG {
+            self.handle_left_room().await?;
             self.handle_world_state_change().await?;
         } else if message.starts_with(APPLICATION_QUIT_LOG_PREFIX) {
             self.handle_world_state_change().await?;
@@ -87,6 +89,16 @@ impl LogParser {
             self.handle_player_leave(name).await?;
         }
 
+        Ok(())
+    }
+
+    async fn handle_entering_world(&mut self) -> Result<()> {
+        println!("handle_entering_world");
+        Ok(())
+    }
+
+    async fn handle_left_room(&mut self) -> Result<()> {
+        println!("handle_left_room");
         Ok(())
     }
 
