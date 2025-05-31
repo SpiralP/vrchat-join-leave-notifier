@@ -30,17 +30,16 @@ pub async fn start_audio(shutdown_send: broadcast::Sender<()>) -> Result<()> {
     let (ok_send, ok_recv) = oneshot::channel();
 
     thread::spawn(move || {
-        let (stream, stream_handle) = match OutputStream::try_default() {
-            Ok(stream) => {
+        match OutputStream::try_default() {
+            Ok(_) => {
                 ok_send.send(true).unwrap();
-                stream
             }
             Err(e) => {
                 eprintln!("start_audio: {e}");
                 ok_send.send(false).unwrap();
                 return;
             }
-        };
+        }
 
         let loop_result = (move || {
             loop {
@@ -62,17 +61,19 @@ pub async fn start_audio(shutdown_send: broadcast::Sender<()>) -> Result<()> {
                     }
                 };
 
+                let (stream, stream_handle) = OutputStream::try_default()?;
+
                 let sink = Sink::try_new(&stream_handle)?;
                 sink.set_volume(0.2);
                 sink.append(Decoder::new(BufReader::new(Cursor::new(match event {
                     AudioEvent::Join => JOIN_SOUND_BYTES,
                     AudioEvent::Leave => LEAVE_SOUND_BYTES,
                 })))?);
-                sink.detach();
-            }
+                sink.sleep_until_end();
 
-            drop(stream);
-            drop(stream_handle);
+                drop(stream_handle);
+                drop(stream);
+            }
 
             anyhow::Ok(())
         })();
