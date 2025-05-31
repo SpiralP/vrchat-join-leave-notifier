@@ -102,17 +102,14 @@ impl LogParser {
     }
 
     async fn handle_entering_world(&mut self) -> Result<()> {
-        println!("handle_entering_world");
         Ok(())
     }
 
     async fn handle_left_room(&mut self) -> Result<()> {
-        println!("handle_left_room");
         Ok(())
     }
 
     async fn handle_world_state_change(&mut self) -> Result<()> {
-        println!("handle_world_state_change");
         Ok(())
     }
 
