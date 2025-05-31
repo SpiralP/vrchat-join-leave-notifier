@@ -1,3 +1,5 @@
+#![allow(clippy::unused_async)]
+
 pub mod utils;
 
 use std::{
@@ -83,16 +85,14 @@ impl LogParser {
         } else if let Some(name_and_uid) = message.strip_prefix(PLAYER_JOINED_LOG_PREFIX) {
             let name = name_and_uid
                 .split_once(" (usr_")
-                .map(|(name, _)| name)
-                .unwrap_or(name_and_uid);
+                .map_or(name_and_uid, |(name, _)| name);
             self.handle_player_join(name).await?;
         } else if let Some(name) = message.strip_prefix(PLAYER_JOIN_COMPLETE_LOG_PREFIX) {
             self.handle_player_join(name).await?;
         } else if let Some(name_and_uid) = message.strip_prefix(PLAYER_LEFT_LOG_PREFIX) {
             let name = name_and_uid
                 .split_once(" (usr_")
-                .map(|(name, _)| name)
-                .unwrap_or(name_and_uid);
+                .map_or(name_and_uid, |(name, _)| name);
             self.handle_player_leave(name).await?;
         } else if let Some(name) = message.strip_prefix(UNREGISTERING_LOG_PREFIX) {
             self.handle_player_leave(name).await?;

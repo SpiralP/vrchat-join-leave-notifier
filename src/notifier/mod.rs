@@ -1,8 +1,10 @@
-use std::{cell::RefCell, collections::HashSet, fmt::Display, time::Duration};
+use std::{cell::RefCell, collections::HashSet, fmt::Display, sync::LazyLock, time::Duration};
 
 use anyhow::Result;
 use deunicode::deunicode;
 use tokio::sync::{mpsc, Mutex, MutexGuard, OnceCell};
+
+use crate::audio::{self, AudioEvent};
 
 pub struct Notification {
     pub sender: mpsc::Sender<String>,
@@ -10,6 +12,7 @@ pub struct Notification {
 }
 
 impl Notification {
+    #[must_use]
     pub fn new() -> Self {
         let (sender, receiver) = mpsc::channel(32);
         Self {
@@ -25,10 +28,8 @@ impl Default for Notification {
     }
 }
 
-lazy_static::lazy_static!(
-    pub static ref NOTIFICATION: std::sync::Mutex<RefCell<Notification>> =
-    std::sync::Mutex::new(RefCell::new(Notification::new()));
-);
+pub static NOTIFICATION: LazyLock<std::sync::Mutex<RefCell<Notification>>> =
+    LazyLock::new(|| std::sync::Mutex::new(RefCell::new(Notification::new())));
 
 pub async fn notify(text: &str) -> Result<()> {
     let text = deunicode(text);
@@ -52,7 +53,7 @@ where
     F: FnOnce(MutexGuard<HashSet<MessageEvent>>) -> R,
 {
     let debounced = DEBOUNCED
-        .get_or_init(move || async move { Default::default() })
+        .get_or_init(move || async move { Mutex::default() })
         .await;
     let debounced = debounced.lock().await;
     f(debounced)
@@ -85,30 +86,31 @@ pub async fn debounced_notify(event: MessageEvent) -> Result<()> {
             tokio::spawn(async move {
                 tokio::time::sleep(DEBOUNCE_DURATION).await;
 
-                let notifies: Vec<(String, Option<Vec<String>>)> =
-                    with_debounced(move |mut debounced| {
-                        let mut notifies = Vec::new();
+                let notifies = with_debounced(move |mut debounced| {
+                    let mut notifies: Vec<(String, Option<Vec<String>>)> = Vec::new();
 
-                        let mut join_messages = Vec::new();
-                        let mut leave_messages = Vec::new();
-                        for event in debounced.drain() {
-                            match event {
-                                MessageEvent::Join(_) => join_messages.push(event.to_string()),
-                                MessageEvent::Leave(_) => leave_messages.push(event.to_string()),
-                            }
+                    let mut join_messages = Vec::new();
+                    let mut leave_messages = Vec::new();
+                    for event in debounced.drain() {
+                        match event {
+                            MessageEvent::Join(_) => join_messages.push(event.to_string()),
+                            MessageEvent::Leave(_) => leave_messages.push(event.to_string()),
                         }
+                    }
 
-                        if !join_messages.is_empty() {
-                            notifies.push(group(join_messages, "players joined"));
-                        }
+                    if !join_messages.is_empty() {
+                        let _ = audio::handle_event(&AudioEvent::Join);
+                        notifies.push(group(join_messages, "players joined"));
+                    }
 
-                        if !leave_messages.is_empty() {
-                            notifies.push(group(leave_messages, "players left"));
-                        }
+                    if !leave_messages.is_empty() {
+                        let _ = audio::handle_event(&AudioEvent::Leave);
+                        notifies.push(group(leave_messages, "players left"));
+                    }
 
-                        notifies
-                    })
-                    .await;
+                    notifies
+                })
+                .await;
 
                 for (title, _body_lines) in notifies {
                     if let Err(e) = notify(&title).await {

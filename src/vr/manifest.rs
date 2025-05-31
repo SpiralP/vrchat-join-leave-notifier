@@ -38,6 +38,7 @@ pub struct VrManifestApplicationString {
 }
 
 impl VrManifest {
+    #[must_use]
     pub fn new(binary_path_windows: &str) -> Self {
         let app_key = APP_KEY.into();
         let binary_path_windows = binary_path_windows.into();

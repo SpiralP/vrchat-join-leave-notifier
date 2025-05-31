@@ -9,7 +9,7 @@ use tokio::{
 use super::utils::get_data_dir;
 use crate::vr::manifest::VrManifest;
 
-/// returns manifest_path
+/// returns `manifest_path`
 pub async fn setup_vr_files() -> Result<PathBuf> {
     let data_dir = get_data_dir().await?;
     let manifest_path = data_dir.join("manifest.vrmanifest");

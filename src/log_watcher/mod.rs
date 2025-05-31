@@ -1,3 +1,5 @@
+#![allow(clippy::assigning_clones)]
+
 use std::time::Duration;
 
 use anyhow::Result;
@@ -8,6 +10,7 @@ use crate::parser::{utils::get_newest_log_path, LogParser};
 pub struct LogWatcher {}
 
 impl LogWatcher {
+    #[must_use]
     pub fn new() -> Self {
         Self {}
     }

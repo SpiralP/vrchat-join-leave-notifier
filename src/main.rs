@@ -1,3 +1,9 @@
+#![warn(clippy::pedantic)]
+#![allow(clippy::missing_panics_doc)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::unnecessary_debug_formatting)]
+
+pub mod audio;
 pub mod config;
 pub mod log_watcher;
 pub mod notifier;
@@ -10,6 +16,7 @@ use anyhow::Result;
 use tokio::{signal, sync::broadcast};
 
 use crate::{
+    audio::start_audio,
     log_watcher::start_log_watcher,
     vr::{runtime::start_runtime, setup::setup_vr},
 };
@@ -30,6 +37,8 @@ async fn main() -> Result<()> {
     start_log_watcher(shutdown_send.clone()).await?;
 
     start_runtime(shutdown_send.clone()).await?;
+
+    start_audio(shutdown_send.clone()).await?;
 
     tokio::select! {
         _ = signal::ctrl_c() => {
