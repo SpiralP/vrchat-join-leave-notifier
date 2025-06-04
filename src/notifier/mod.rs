@@ -32,8 +32,15 @@ pub static NOTIFICATION: LazyLock<std::sync::Mutex<RefCell<Notification>>> =
     LazyLock::new(|| std::sync::Mutex::new(RefCell::new(Notification::new())));
 
 pub async fn notify(text: &str) -> Result<()> {
+    let date = time::OffsetDateTime::now_local()
+        .ok()
+        .and_then(|dt| {
+            dt.format(&time::format_description::well_known::Rfc2822)
+                .ok()
+        })
+        .unwrap_or_else(|| "unknown time".to_string());
     let text = deunicode(text);
-    println!("{text}");
+    println!("{date} | {text}");
 
     let sender = {
         let guard = NOTIFICATION.lock().unwrap();
