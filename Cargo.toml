@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1"
-deunicode = "1"
-dirs = "6"
+anyhow = "=1.0.98"
+deunicode = "=1.6.2"
+dirs = "=6.0.0"
 openvr = { git = "https://github.com/SpiralP/rust-openvr.git" }
-rodio = { version = "0.20.1", default-features = false, features = ["wav"] }
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+rodio = { version = "=0.20.1", default-features = false, features = ["wav"] }
+serde = { version = "=1.0.219", features = ["derive"] }
+serde_json = "=1.0.140"
 time = { version = "=0.3.41", features = ["formatting", "local-offset"] }
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "=1.45.1", features = ["full"] }
