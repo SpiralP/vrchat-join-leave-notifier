@@ -641,7 +641,7 @@ checksum = "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d"
 [[package]]
 name = "openvr"
 version = "0.7.0"
-source = "git+https://github.com/SpiralP/rust-openvr.git#a0c3375fe757988f1828a4b70ca9b62e3370bdfd"
+source = "git+https://github.com/SpiralP/rust-openvr.git?branch=master#a0c3375fe757988f1828a4b70ca9b62e3370bdfd"
 dependencies = [
  "lazy_static",
  "openvr_sys",
