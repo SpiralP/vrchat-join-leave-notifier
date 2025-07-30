@@ -1,7 +1,6 @@
 #![warn(clippy::pedantic)]
 #![allow(clippy::missing_panics_doc)]
 #![allow(clippy::missing_errors_doc)]
-#![allow(clippy::unnecessary_debug_formatting)]
 
 pub mod audio;
 pub mod config;

@@ -6,7 +6,7 @@ use std::{
 };
 
 use anyhow::{ensure, Result};
-use rodio::{Decoder, OutputStream, Sink};
+use rodio::{Decoder, OutputStreamBuilder, Sink};
 use tokio::sync::{broadcast, oneshot};
 
 const JOIN_SOUND_BYTES: &[u8] = include_bytes!("../../sounds/mixkit-correct-answer-tone-2870.wav");
@@ -30,7 +30,7 @@ pub async fn start_audio(shutdown_send: broadcast::Sender<()>) -> Result<()> {
     let (ok_send, ok_recv) = oneshot::channel();
 
     thread::spawn(move || {
-        match OutputStream::try_default() {
+        match OutputStreamBuilder::open_default_stream() {
             Ok(_) => {
                 ok_send.send(true).unwrap();
             }
@@ -61,9 +61,9 @@ pub async fn start_audio(shutdown_send: broadcast::Sender<()>) -> Result<()> {
                     }
                 };
 
-                let (stream, stream_handle) = OutputStream::try_default()?;
+                let stream = OutputStreamBuilder::open_default_stream()?;
 
-                let sink = Sink::try_new(&stream_handle)?;
+                let sink = Sink::connect_new(stream.mixer());
                 sink.set_volume(0.2);
                 sink.append(Decoder::new(BufReader::new(Cursor::new(match event {
                     AudioEvent::Join => JOIN_SOUND_BYTES,
@@ -71,7 +71,6 @@ pub async fn start_audio(shutdown_send: broadcast::Sender<()>) -> Result<()> {
                 })))?);
                 sink.sleep_until_end();
 
-                drop(stream_handle);
                 drop(stream);
             }
 
