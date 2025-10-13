@@ -9,7 +9,7 @@ deunicode = "=1.6.2"
 dirs = "=6.0.0"
 openvr = { git = "https://github.com/SpiralP/rust-openvr.git", branch = "master" }
 rodio = { version = "=0.21.1", default-features = false, features = ["playback", "wav"] }
-serde = { version = "=1.0.225", features = ["derive"] }
+serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = "=1.0.145"
 time = { version = "=0.3.44", features = ["formatting", "local-offset"] }
 tokio = { version = "=1.47.1", features = ["full"] }
