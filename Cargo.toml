@@ -12,4 +12,4 @@ rodio = { version = "=0.21.1", default-features = false, features = ["playback",
 serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = "=1.0.145"
 time = { version = "=0.3.44", features = ["formatting", "local-offset"] }
-tokio = { version = "=1.47.1", features = ["full"] }
+tokio = { version = "=1.47.2", features = ["full"] }
