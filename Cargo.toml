@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "=1.0.100"
+anyhow = "=1.0.101"
 deunicode = "=1.6.2"
 dirs = "=6.0.0"
 openvr = { git = "https://github.com/SpiralP/rust-openvr.git", branch = "master" }
