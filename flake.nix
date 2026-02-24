@@ -1,6 +1,6 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
   outputs = { self, nixpkgs }:
@@ -35,6 +35,9 @@
               lockFile = ./Cargo.lock;
               allowBuiltinFetchGit = true;
             };
+
+            # fix for `Compatibility with CMake < 3.5 has been removed from CMake.`
+            env.CMAKE_POLICY_VERSION_MINIMUM = "3.5";
 
             buildInputs = with pkgs; [
               alsa-lib
