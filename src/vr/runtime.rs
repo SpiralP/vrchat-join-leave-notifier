@@ -1,17 +1,17 @@
 use std::{thread, time::Duration};
 
-use anyhow::{ensure, Error, Result};
+use anyhow::{Error, Result, ensure};
 use openvr::{
+    ApplicationType,
     sys::{EVRNotificationStyle_None, EVRNotificationType_Transient},
     system::Event,
-    ApplicationType,
 };
 use tokio::sync::{
     broadcast::{self, error::TryRecvError},
     mpsc, oneshot,
 };
 
-use crate::notifier::{notify, NOTIFICATION};
+use crate::notifier::{NOTIFICATION, notify};
 
 pub async fn start_runtime(shutdown_send: broadcast::Sender<()>) -> Result<()> {
     let mut shutdown_recv = shutdown_send.subscribe();
@@ -62,7 +62,9 @@ async fn start_event_stream(shutdown_send: broadcast::Sender<()>) -> Result<mpsc
             let system = context.system()?;
             let overlay = context.overlay()?;
             let notifications = context.notifications()?;
-            let notifications_overlay = overlay.find("system.systemui")?;
+            let notifications_overlay = overlay
+                .find("system.systemui")
+                .map_err(|e| anyhow::anyhow!("overlay.find(\"system.systemui\"): {e:?}"))?;
 
             Ok::<_, Error>((
                 context,

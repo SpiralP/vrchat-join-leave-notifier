@@ -1,11 +1,11 @@
 use std::{
     io::{BufReader, Cursor},
-    sync::{mpsc, OnceLock},
+    sync::{OnceLock, mpsc},
     thread,
     time::Duration,
 };
 
-use anyhow::{ensure, Result};
+use anyhow::{Result, ensure};
 use rodio::{Decoder, DeviceSinkBuilder, Player};
 use tokio::sync::{broadcast, oneshot};
 

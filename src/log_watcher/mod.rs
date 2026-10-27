@@ -5,7 +5,7 @@ use std::time::Duration;
 use anyhow::Result;
 use tokio::{sync::broadcast, task::JoinHandle, time::MissedTickBehavior};
 
-use crate::parser::{utils::get_newest_log_path, LogParser};
+use crate::parser::{LogParser, utils::get_newest_log_path};
 
 pub struct LogWatcher {}
 
@@ -47,7 +47,7 @@ impl LogWatcher {
                         };
 
                         if let Err(e) = f.await {
-                            eprintln!("watch_handle: {log_path:?} {e:?}");
+                            eprintln!("watch_handle: {} {e:?}", log_path.display());
                         }
                     }));
                 }

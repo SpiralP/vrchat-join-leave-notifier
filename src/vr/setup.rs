@@ -1,4 +1,4 @@
-use anyhow::{ensure, Context, Result};
+use anyhow::{Context, Result, ensure};
 
 use crate::{config::setup_vr::setup_vr_files, vr::APP_KEY};
 

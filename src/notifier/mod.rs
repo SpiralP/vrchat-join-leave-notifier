@@ -2,7 +2,7 @@ use std::{cell::RefCell, collections::HashSet, fmt::Display, sync::LazyLock, tim
 
 use anyhow::Result;
 use deunicode::deunicode;
-use tokio::sync::{mpsc, Mutex, MutexGuard, OnceCell};
+use tokio::sync::{Mutex, MutexGuard, OnceCell, mpsc};
 
 use crate::audio::{self, AudioEvent};
 
