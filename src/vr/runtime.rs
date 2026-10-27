@@ -62,7 +62,9 @@ async fn start_event_stream(shutdown_send: broadcast::Sender<()>) -> Result<mpsc
             let system = context.system()?;
             let overlay = context.overlay()?;
             let notifications = context.notifications()?;
-            let notifications_overlay = overlay.find("system.systemui")?;
+            let notifications_overlay = overlay
+                .find("system.systemui")
+                .map_err(|e| anyhow::anyhow!("overlay.find(\"system.systemui\"): {e:?}"))?;
 
             Ok::<_, Error>((
                 context,
