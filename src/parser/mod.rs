@@ -14,7 +14,7 @@ use tokio::{
     time::MissedTickBehavior,
 };
 
-use crate::notifier::{debounced_notify, MessageEvent};
+use crate::notifier::{MessageEvent, debounced_notify};
 
 const ENTERING_WORLD_LOG: &str = "[Behaviour] Entering world";
 const FINISHED_ENTERING_WORLD_LOG: &str = "[Behaviour] Finished entering world.";

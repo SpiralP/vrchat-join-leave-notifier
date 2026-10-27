@@ -3,7 +3,7 @@ use std::{
     time::SystemTime,
 };
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result, bail};
 use tokio::fs;
 
 pub async fn get_vrchat_dir() -> Result<PathBuf> {
@@ -35,8 +35,7 @@ pub async fn get_vrchat_dir() -> Result<PathBuf> {
 
     if !fs::metadata(&vrchat_dir)
         .await
-        .map(|metadata| metadata.is_dir())
-        .unwrap_or(false)
+        .is_ok_and(|metadata| metadata.is_dir())
     {
         bail!("vrchat dir doesn't exist");
     }
@@ -50,8 +49,7 @@ pub const LOG_FILE_SUFFIX: &str = ".txt";
 async fn is_log_file(path: &Path) -> bool {
     if !fs::metadata(path)
         .await
-        .map(|metadata| metadata.is_file())
-        .unwrap_or(false)
+        .is_ok_and(|metadata| metadata.is_file())
     {
         return false;
     }
