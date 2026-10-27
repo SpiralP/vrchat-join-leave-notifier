@@ -1,18 +1,21 @@
 {
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
   };
 
-  outputs = { self, nixpkgs }:
+  outputs =
+    { self, nixpkgs }:
     let
       inherit (nixpkgs) lib;
 
       rustManifest = lib.importTOML ./Cargo.toml;
 
-      revSuffix = lib.optionalString (self ? shortRev || self ? dirtyShortRev)
-        "-${self.shortRev or self.dirtyShortRev}";
+      revSuffix =
+        lib.optionalString (self ? shortRev || self ? dirtyShortRev)
+          "-${self.shortRev or self.dirtyShortRev}";
 
-      makePackages = (system: dev:
+      makePackages = (
+        system: dev:
         let
           pkgs = import nixpkgs {
             inherit system;
@@ -44,24 +47,31 @@
               openssl
             ];
 
-            nativeBuildInputs = (with pkgs; [
-              cmake
-              pkg-config
-              rustPlatform.bindgenHook
-            ]) ++ (if dev then
-              with pkgs; [
-                clippy
-                rust-analyzer
-                (rustfmt.override { asNightly = true; })
-              ] else [ ]);
+            nativeBuildInputs =
+              (with pkgs; [
+                cmake
+                pkg-config
+                rustPlatform.bindgenHook
+              ])
+              ++ (
+                if dev then
+                  with pkgs;
+                  [
+                    clippy
+                    rust-analyzer
+                    (rustfmt.override { asNightly = true; })
+                  ]
+                else
+                  [ ]
+              );
           };
         }
       );
     in
-    builtins.foldl' lib.recursiveUpdate { } (builtins.map
-      (system: {
+    builtins.foldl' lib.recursiveUpdate { } (
+      builtins.map (system: {
         devShells.${system} = makePackages system true;
         packages.${system} = makePackages system false;
-      })
-      lib.systems.flakeExposed);
+      }) lib.systems.flakeExposed
+    );
 }
